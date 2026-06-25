@@ -4,8 +4,12 @@
 # Speech recognition engine (Parakeet via ONNX)
 sherpa-onnx==1.13.2
 
-# On-device LLM for homophone/correction stage (MLX, Apple Silicon)
-mlx-lm==0.31.3
+# On-device LLM for the homophone/correction stage (llm_backend.py seam).
+#   llama-cpp-python = the PORTABLE backend (GGUF) — runs the same model on macOS (Metal),
+#     Windows & Linux, so the L3 LLM polish is identical on all three OSes (the unified backend).
+#   mlx-lm = the Apple-Silicon-only fast path (kept selectable via DUM_LLM_BACKEND=mlx).
+llama-cpp-python==0.3.31
+mlx-lm==0.31.3 ; sys_platform == "darwin"
 
 # Audio capture + WAV I/O
 sounddevice==0.5.5
