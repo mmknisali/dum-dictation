@@ -17,7 +17,9 @@ for you.
 
 ## What you need
 
-- A Mac with Apple Silicon (M-series)
+- A **Mac** with Apple Silicon (M-series) — the full experience, including the homophone LLM
+- …or **Windows 10/11** — same dictation + tech-vocab, minus the (Apple-only) homophone LLM. See
+  [On Windows](#on-windows) below.
 - Python 3.12
 
 ## Install
@@ -94,6 +96,41 @@ After the first auto-start, macOS re-asks for Microphone / Accessibility / Input
 Monitoring — this time for the venv's `python` (a login item isn't your terminal). Grant
 those three once and log out/in. Running a second copy is refused automatically — one
 robot owns the mic and hotkey.
+
+## On Windows
+
+Same idea, same tech-vocab smarts — it types into any focused Windows app (VS Code, the
+Claude Code box, Chrome, Slack, a WSL terminal). The one difference: the homophone LLM
+(`grep`/`grab`, `git`/`get`) is Apple-Silicon only, so on Windows you get the phonetic +
+alias layers — the main value — without it.
+
+In **PowerShell** (Python 3.12 from python.org on your PATH):
+
+```powershell
+git clone https://github.com/eliasmocik/dum-dictation.git
+cd dum-dictation
+.\setup.ps1
+.\dum.ps1
+```
+
+`.\setup.ps1` makes the venv, installs the deps (the Mac-only wheels are skipped; `pywin32`
+is added) and downloads the speech model. The only permission is the **microphone**:
+Settings → Privacy & security → Microphone → let desktop apps use it. No Accessibility /
+Input-Monitoring step like macOS.
+
+Double-tap the **RIGHT Ctrl** key to start/stop (change it with `.\dum.ps1 --config`).
+Want the tray icon and start-at-logon?
+
+```powershell
+.\dum.ps1 --tray               # tray icon, no console window
+.\dum.ps1 --install-autostart  # start at logon + relaunch on crash (Task Scheduler)
+.\dum.ps1 --uninstall-autostart
+```
+
+> Running in WSL? Dictation needs the real keyboard, mic and screen — which Windows owns —
+> so install and run the **Windows** version above. It still types straight into your WSL
+> terminal (and through it, into anything you've SSH'd to). You don't install dum inside WSL
+> or on a remote server; it lives on the machine in front of you.
 
 ## Privacy
 
