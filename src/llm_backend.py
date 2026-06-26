@@ -26,6 +26,22 @@ DUM_LLM_BACKEND (e.g. "mlx") to pin/benchmark one backend against another on one
 import atexit
 import os
 
+# Live LlamaCppBackend instances. A GUI/signal teardown (see live.run_tray) frees these
+# BEFORE the process exits, because AppKit's terminate / Ctrl+C in --tray calls C exit()
+# directly, bypassing Python's atexit — leaving Metal's static destructor to SIGABRT.
+_LIVE_BACKENDS = []
+
+
+def close_all_backends():
+    """Free every live llama.cpp backend now. Idempotent. Call from a GUI/signal teardown
+    before exiting so llama.cpp's Metal device frees cleanly (atexit doesn't run on AppKit's
+    raw exit())."""
+    for b in list(_LIVE_BACKENDS):
+        try:
+            b.close()
+        except Exception:
+            pass
+
 
 class LLMBackend:
     """Abstract inference primitive. Subclasses implement generate()."""
@@ -95,6 +111,7 @@ class LlamaCppBackend(LLMBackend):
         # model at normal interpreter shutdown (atexit runs BEFORE __cxa_finalize) lets the device
         # free cleanly. Harmless on CPU/CUDA builds. See llama.cpp ggml-metal device-free assert.
         self._closed = False
+        _LIVE_BACKENDS.append(self)
         atexit.register(self.close)
 
     def close(self):

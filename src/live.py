@@ -1029,6 +1029,7 @@ def run_tray(app, trigger_key="cmd_l", mode="toggle"):
     tray icon instead of a babysat terminal. The hotkey listener runs on its own thread;
     the tray owns the MAIN thread (required for the macOS GUI loop) and blocks until Quit.
     """
+    import signal
     from tray import run as run_tray_gui
 
     listener = run_double_tap_toggle(app, trigger_key=trigger_key, mode=mode, block=False)
@@ -1038,6 +1039,22 @@ def run_tray(app, trigger_key="cmd_l", mode="toggle"):
             listener.stop()
         finally:
             app.stop()
+            try:
+                from llm_backend import close_all_backends
+                close_all_backends()    # free llama.cpp Metal BEFORE exit (atexit is bypassed
+                                        # when AppKit/Ctrl+C calls C exit() — would SIGABRT)
+            except Exception:
+                pass
+
+    def _on_signal(_sig, _frm):
+        # Ctrl+C / SIGTERM in --tray would otherwise hit AppKit's raw exit() and crash in
+        # llama.cpp's Metal static destructor. Free the model, then os._exit to skip the C++
+        # finalizers entirely — a clean quit with no native trace.
+        _teardown()
+        os._exit(0)
+
+    signal.signal(signal.SIGINT, _on_signal)
+    signal.signal(signal.SIGTERM, _on_signal)
 
     run_tray_gui(app, on_quit=_teardown)   # blocks on the main thread until Quit
 
