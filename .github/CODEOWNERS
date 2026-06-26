@@ -27,7 +27,16 @@
 /src/platform_io.py        @eliasmocik
 /src/platform_mac.py       @eliasmocik
 
-# --- Windows platform: UNOWNED on purpose => Rado edits freely, no approval needed ---
+# --- Shared app / launch infrastructure (cross-platform, but core UX => Elias owns it) ---
+# tray + autostart + single-instance are one cross-platform implementation (pystray etc.).
+# Rado contributed them, but going forward they're shared infra Elias maintains, so changes
+# to shared launch behaviour get his review. The macOS launcher (./dum) is his too.
+/src/tray.py               @eliasmocik
+/src/autostart.py          @eliasmocik
+/src/single_instance.py    @eliasmocik
+/dum                       @eliasmocik
+
+# --- Windows-only: UNOWNED on purpose => Rado edits freely, no approval needed ---
 #   /src/platform_windows.py   (no owner)
 #   /dum.ps1                   (no owner)
 #   /setup.ps1                 (no owner)
