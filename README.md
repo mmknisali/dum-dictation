@@ -4,35 +4,28 @@ Opensource local alternative to Wispr Flow.
 
 ![dum dictation demo](docs/demo.gif)
 
-Ok real talk: this is Apple Dictation, except it doesn't butcher your tech words. It gets `git`,
-`kubectl`, `nginx`, `PostgreSQL`, `TanStack Query` and friends right, where normal dictation hears
-"get hub" or "engine x". It runs on your machine and types live into whatever application you're in.
+Ok real talk: it's Apple Dictation, except it doesn't butcher your tech words. It gets `git`,
+`kubectl`, `nginx`, `PostgreSQL`, `TanStack Query` and friends right where normal dictation hears
+"get hub" or "engine x". Runs on your machine, types live into whatever app you're in.
 
-> **Tried it? Tell me how it went.** One sentence in
-> [Discussions](https://github.com/eliasmocik/dum-dictation/discussions) or an
-> [issue](https://github.com/eliasmocik/dum-dictation/issues/new) really helps.
+> Tried it? Tell me how it went in [Discussions](https://github.com/eliasmocik/dum-dictation/discussions)
+> or an [issue](https://github.com/eliasmocik/dum-dictation/issues/new).
 
 ## What you need
 
-- **macOS** (Apple Silicon, M-series) - the primary, best-tested platform
-- **Windows 10/11** - tested and working. See [On Windows](#on-windows) below.
-- **Linux** (X11) - experimental. See [On Linux](#on-linux) below.
+- **macOS** (Apple Silicon, M-series) - primary, best-tested
+- **Windows 10/11** - tested and working ([setup](#on-windows))
+- **Linux** (X11) - experimental ([setup](#on-linux))
 - Python 3.12
 
 ## Install (macOS)
-
-One command:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/eliasmocik/dum-dictation/main/install.sh | bash
 ```
 
-That clones the repo into `./dum-dictation` and runs `./setup`, which makes a virtualenv,
-installs the deps, and downloads the speech model + the on-device correction model. Afterwards
-you grant a few macOS permissions once - see [Permissions](#permissions-one-time---mac-makes-you-do-this)
-right below.
-
-Prefer not to pipe curl into bash? Same thing, by hand:
+Clones into `./dum-dictation`, runs `./setup` (venv + deps + speech/correction models), then asks
+for [permissions](#permissions-macos-one-time). By hand instead:
 
 ```sh
 git clone https://github.com/eliasmocik/dum-dictation.git
@@ -40,28 +33,17 @@ cd dum-dictation
 ./setup
 ```
 
-**On Windows or Linux?** Jump to [On Windows](#on-windows) or [On Linux](#on-linux) - the
-one-liner above is macOS-only.
+The one-liner is macOS-only. Windows and Linux: see below.
 
-## Permissions (one time - Mac makes you do this)
+## Permissions (macOS, one time)
 
-Dictation literally can't work without these, so don't skip it. The app you need to grant them to
-is **whatever app you ran `./dum` from** - Terminal, iTerm, or the VS Code terminal. (If you run it
-in the VS Code terminal, you grant them to **Visual Studio Code**.)
-
-The first time you run `./dum`, macOS will pop these up on its own - just click **Allow** / **Open
-System Settings**. If it doesn't, set them by hand: open **System Settings → Privacy & Security**,
-then for each of the three, find your terminal app in the list and flip the switch **on**:
+Grant these to the app you ran `./dum` from (Terminal, iTerm, or VS Code), then **quit and reopen it**:
 
 1. **Microphone**
 2. **Accessibility**
 3. **Input Monitoring**
 
-⚠️ **Then fully quit your terminal app and reopen it.**
-
-<!-- Optional but recommended for non-technical friends: add 3 small screenshots of the toggles.
-Drop them in docs/ as docs/perm-mic.png, docs/perm-accessibility.png, docs/perm-input.png and
-reference them here. The grant step is where most people get stuck. -->
+macOS usually prompts on first run. Otherwise: System Settings => Privacy & Security.
 
 ## Using it
 
@@ -69,44 +51,25 @@ reference them here. The grant step is where most people get stuck. -->
 ./dum
 ```
 
-Double-tap the **LEFT Command (⌘)** key to start talking, double-tap again to stop. Words show up
-live as you speak, and when you pause it cleans up the sentence and locks it in. Ctrl+C to quit.
+- Double-tap **LEFT ⌘** to start/stop. Words appear live; a pause locks the sentence in. Ctrl+C quits.
+- Pick a mic: `DUM_MIC="MacBook Air" ./dum` (by name) or `./dum --mic 1` (by index; list them with
+  `.venv/bin/python src/live.py --list-devices`).
 
-Need a different mic?
-
-```sh
-DUM_MIC="MacBook Air" ./dum     # by name (survives device-index shuffles)
-./dum --mic 1                    # by index (list them: .venv/bin/python src/live.py --list-devices)
-```
-
-### Run it like a real app (menu bar + auto-start)
-
-Add `--tray` and dum lives in your menu bar - a little dot (green = listening, grey = idle) with
-Start/Stop and Quit. The hotkey still works the same.
+### Menu bar + auto-start
 
 ```sh
-./dum --tray
+./dum --tray                 # menu-bar icon (green = listening, grey = idle)
+./dum --install-autostart    # start at login, relaunch on crash (--autostart-status, --uninstall-autostart)
 ```
 
-To have it **start by itself at login** (and quietly relaunch if it ever crashes):
-
-```sh
-./dum --install-autostart      # set it up   (also: --autostart-status)
-./dum --uninstall-autostart    # undo it
-```
-
-After the first auto-start, macOS re-asks for Microphone / Accessibility / Input Monitoring.
+Auto-start re-asks for the three permissions (this time for the venv `python`).
 
 ## On Windows
 
-> ✅ **Tested and working on Windows 10/11.**
+✅ Tested and working on Windows 10/11. Same tech-vocab smarts, plus the full homophone LLM via the
+portable llama.cpp backend.
 
-Same idea, same tech-vocab smarts - it types into any focused Windows app (VS Code, the
-Claude Code box, Chrome, Slack, a WSL terminal). The homophone LLM (`grep`/`grab`,
-`git`/`get`) runs on Windows too via the portable llama.cpp backend (the same model as
-Mac), so you get the full phonetic + alias + LLM stack.
-
-In **PowerShell** (Python 3.12 from python.org on your PATH):
+In **PowerShell** (Python 3.12 on your PATH):
 
 ```powershell
 git clone https://github.com/eliasmocik/dum-dictation.git
@@ -115,51 +78,35 @@ cd dum-dictation
 .\dum.ps1
 ```
 
-`.\setup.ps1` makes the venv, installs the deps (the Mac-only wheels are skipped; `pywin32`
-is added) and downloads the speech model. The only permission is the **microphone**:
-Settings → Privacy & security → Microphone → let desktop apps use it. No Accessibility /
-Input-Monitoring step like macOS.
+- Double-tap **RIGHT Ctrl** to start/stop (change it: `.\dum.ps1 --config`).
+- Only permission: **microphone** (Settings => Privacy & security => Microphone).
+- Tray + logon: `.\dum.ps1 --tray`, `.\dum.ps1 --install-autostart`.
 
-Double-tap the **RIGHT Ctrl** key to start/stop (change it with `.\dum.ps1 --config`).
-Want the tray icon and start-at-logon?
-
-```powershell
-.\dum.ps1 --tray               # tray icon, no console window
-.\dum.ps1 --install-autostart  # start at logon + relaunch on crash (Task Scheduler)
-.\dum.ps1 --uninstall-autostart
-```
-
-> Running in WSL? The tool needs the real keyboard, mic and screen (which Windows owns), so
-> install and run the **Windows** version above.
+> WSL? The tool needs the real keyboard, mic and screen (Windows owns those), so run the Windows
+> version above.
 
 ## On Linux
 
-> ⚠️ **Experimental!** We are looking for a Linux contributor. Reach out on
+> ⚠️ **Experimental!** Looking for a Linux contributor. Reach out on
 > [Discussions](https://github.com/eliasmocik/dum-dictation/discussions) or [@eliasmocik](https://github.com/eliasmocik).
 
 ```sh
-sudo apt install xdotool xclip      # (or your distro's equivalent; wl-clipboard for Wayland)
+sudo apt install xdotool xclip      # or wl-clipboard on Wayland
 git clone https://github.com/eliasmocik/dum-dictation.git
 cd dum-dictation
-./setup                              # skips the Apple-only LLM automatically
+./setup                              # skips the Apple-only LLM
 ./dum                                # double-tap RIGHT Ctrl to start/stop
-./dum --tray                         # tray icon
-./dum --install-autostart            # systemd --user service (start at login + relaunch on crash)
+./dum --tray
+./dum --install-autostart            # systemd --user service
 ```
 
-Typing is layout-independent via `xdotool type` (so a Slovak/dead-key layout isn't mangled);
-clipboard paste uses `xclip` or `wl-clipboard`. If those tools aren't installed it still runs,
-just degraded (types via a generic backend, no focus guard).
-
-> **Wayland:** the typing/clipboard tools above are X11. Under a pure Wayland session, run under
-> XWayland or install `ydotool` + `wl-clipboard`.
+Wayland: run under XWayland, or install `ydotool` + `wl-clipboard`.
 
 ## Privacy
 
-Everything stays on your machine. There's an
-optional local-only log (off by default) that remembers what you dictated so the misheard words
-can get fixed over time, but it never leaves your computer and `dogfood/` is gitignored. The full
-breakdown is in [`docs/DOGFOOD.md`](docs/DOGFOOD.md).
+Everything stays on your machine. Optional local-only log (off by default) that remembers dictations
+so misheard words get fixed over time; it never leaves your computer and `dogfood/` is gitignored.
+Details: [`docs/DOGFOOD.md`](docs/DOGFOOD.md).
 
 ## Want to help?
 
