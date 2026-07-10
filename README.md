@@ -201,8 +201,7 @@ in the open, so real feedback is what moves it.
 
 ## License
 
-MIT (see [`LICENSE`](LICENSE)). Free to use, fork, and build on - no strings attached. If you ship
-a vocab fix back, even better, but you never have to.
+MIT (see [`LICENSE`](LICENSE)). Free to use, fork and build on.
 
 ---
 
