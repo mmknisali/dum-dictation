@@ -8,45 +8,40 @@ Ok real talk: this is Apple Dictation, except it doesn't butcher your tech words
 `kubectl`, `nginx`, `PostgreSQL`, `TanStack Query` and friends right, where normal dictation hears
 "get hub" or "engine x". It runs on your machine and types into whatever app you're in.
 
-Built for vibecoders. The bar I'm going for is **"I forgot I was using it"**. If you just want
-to talk and have the right text show up, this is for you.
-
-> **Tried it? Tell me how it went - good or bad.** One sentence in
+> **Tried it? Tell me how it went.** One sentence in
 > [Discussions](https://github.com/eliasmocik/dum-dictation/discussions) or an
 > [issue](https://github.com/eliasmocik/dum-dictation/issues/new) really helps.
 
 ## What you need
 
-- A **Mac** with Apple Silicon (M-series) - the full experience, including the homophone LLM
-- …or **Windows 10/11** - same dictation + tech-vocab, minus the (Apple-only) homophone LLM. See
-  [On Windows](#on-windows) below.
-- …or **Linux** (X11) - same as Windows, via `xdotool` + `xclip`/`wl-clipboard`. See
-  [On Linux](#on-linux) below.
+- **macOS** (Apple Silicon, M-series) - the primary, best-tested platform
+- **Windows 10/11** - tested and working. See [On Windows](#on-windows) below.
+- **Linux** (X11) - experimental. See [On Linux](#on-linux) below.
 - Python 3.12
 
-## Install
+## Install (macOS)
 
-One command (macOS / Linux):
+One command:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/eliasmocik/dum-dictation/main/install.sh | bash
 ```
 
-(On Windows, follow [On Windows](#on-windows) below instead - the one-liner is bash-only.)
-
 That clones the repo into `./dum-dictation` and runs `./setup`, which makes a virtualenv,
-installs the deps, downloads the speech model + the on-device correction model, and then tells
-you which permissions to grant. (On a Mac you'll still have to click
-through the permission prompts afterwards - see [Permissions](#permissions-one-time---mac-makes-you-do-this)
-right below.)
+installs the deps, and downloads the speech model + the on-device correction model. Afterwards
+you grant a few macOS permissions once - see [Permissions](#permissions-one-time---mac-makes-you-do-this)
+right below.
 
-Prefer not to pipe curl into bash? Same thing in three commands:
+Prefer not to pipe curl into bash? Same thing, by hand:
 
 ```sh
 git clone https://github.com/eliasmocik/dum-dictation.git
 cd dum-dictation
 ./setup
 ```
+
+**On Windows or Linux?** Jump to [On Windows](#on-windows) or [On Linux](#on-linux) - the
+one-liner above is macOS-only.
 
 ## Permissions (one time - Mac makes you do this)
 
@@ -112,13 +107,12 @@ robot owns the mic and hotkey.
 
 ## On Windows
 
-> ⚠️ **Experimental - not yet tested on real Windows hardware.** Treat it as a preview.
+> ✅ **Tested and working on Windows 10/11** (a contributor ran it on real hardware).
 
 Same idea, same tech-vocab smarts - it types into any focused Windows app (VS Code, the
 Claude Code box, Chrome, Slack, a WSL terminal). The homophone LLM (`grep`/`grab`,
-`git`/`get`) now runs on Windows too via the portable llama.cpp backend (the same model as
-Mac), so you get the full phonetic + alias + LLM stack - though that path is still unverified
-on real hardware.
+`git`/`get`) runs on Windows too via the portable llama.cpp backend (the same model as
+Mac), so you get the full phonetic + alias + LLM stack.
 
 In **PowerShell** (Python 3.12 from python.org on your PATH):
 
@@ -150,7 +144,12 @@ Want the tray icon and start-at-logon?
 
 ## On Linux
 
-> ⚠️ **Experimental / parked - no maintainer testing this yet.** Code is present but unverified.
+> ⚠️ **Experimental.** The code is all here and should work, but it's the least-tested path.
+
+**Linux is untested - I'm looking for a contributor!** If you run Linux and want to help make this
+solid, that would mean a lot. [Open an issue](https://github.com/eliasmocik/dum-dictation/issues/new),
+[start a discussion](https://github.com/eliasmocik/dum-dictation/discussions), or reach me on GitHub
+[@eliasmocik](https://github.com/eliasmocik).
 
 Same again, for a Linux **desktop** you sit in front of (not a headless server - there's no mic
 or screen to dictate into there). It uses the standard X11 tools:
