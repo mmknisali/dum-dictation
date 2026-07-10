@@ -66,8 +66,7 @@ Auto-start re-asks for the three permissions (this time for the venv `python`).
 
 ## On Windows
 
-✅ Tested and working on Windows 10/11. Same tech-vocab smarts, plus the full homophone LLM via the
-portable llama.cpp backend.
+✅ Tested and working on Windows 10/11.
 
 In **PowerShell** (Python 3.12 on your PATH):
 
@@ -105,8 +104,7 @@ Wayland: run under XWayland, or install `ydotool` + `wl-clipboard`.
 ## Privacy
 
 Everything stays on your machine. Optional local-only log (off by default) that remembers dictations
-so misheard words get fixed over time; it never leaves your computer and `dogfood/` is gitignored.
-Details: [`docs/DOGFOOD.md`](docs/DOGFOOD.md).
+so misheard words get fixed over time. Details: [`docs/DOGFOOD.md`](docs/DOGFOOD.md).
 
 ## Want to help?
 
