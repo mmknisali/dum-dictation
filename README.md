@@ -1,6 +1,6 @@
 # dum dictation
 
-An open, local alternative to Wispr Flow.
+Opensource local alternative to Wispr Flow.
 
 ![dum dictation demo](docs/demo.gif)
 
@@ -8,9 +8,8 @@ Ok real talk: this is Apple Dictation, except it doesn't butcher your tech words
 `kubectl`, `nginx`, `PostgreSQL`, `TanStack Query` and friends right, where normal dictation hears
 "get hub" or "engine x". It runs on your machine and types into whatever app you're in.
 
-Built for vibecoders. The bar I'm going for is **"I forgot I was using it"** so you
-can think clearly. If you just want to talk and have the right text show up, this is
-for you.
+Built for vibecoders. The bar I'm going for is **"I forgot I was using it"**. If you just want
+to talk and have the right text show up, this is for you.
 
 > **Tried it? Tell me how it went - good or bad.** One sentence in
 > [Discussions](https://github.com/eliasmocik/dum-dictation/discussions) or an
@@ -37,7 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/eliasmocik/dum-dictation/main/insta
 
 That clones the repo into `./dum-dictation` and runs `./setup`, which makes a virtualenv,
 installs the deps, downloads the speech model + the on-device correction model, and then tells
-you which permissions to grant. That's the whole setup. (On a Mac you'll still have to click
+you which permissions to grant. (On a Mac you'll still have to click
 through the permission prompts afterwards - see [Permissions](#permissions-one-time---mac-makes-you-do-this)
 right below.)
 
@@ -187,8 +186,7 @@ breakdown is in [`docs/DOGFOOD.md`](docs/DOGFOOD.md).
 your words right? Did you still have it on a week later? Drop it in
 [Discussions](https://github.com/eliasmocik/dum-dictation/discussions) or
 [open an issue](https://github.com/eliasmocik/dum-dictation/issues/new). Blunt is fine - "the setup
-broke here" or "it kept hearing X as Y" is exactly what I need. This is a side project I'm building
-in the open, so real feedback is what moves it.
+broke here" or "it kept hearing X as Y" is exactly what I need.
 
 **Next most useful:** a vocab fix (a word it keeps getting wrong). Ideally read
 [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md), but the general-vs-personal rule is the whole deal.
