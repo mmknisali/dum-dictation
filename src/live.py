@@ -10,8 +10,8 @@ COMMITTED sentence at the cursor.
 This is the real-time sibling of prototype.py: the prototype proved the loop on
 WAV files (silence-split + growing-window streaming + dictionary correction);
 this drives the exact same core from a live microphone and types into whatever
-app is focused - made for dictating into the VS Code terminal to drive Claude
-Code. It reuses dum's paste-at-cursor + beep trick.
+app is focused - made for dictating into a terminal or editor to drive a
+coding agent. It reuses dum's paste-at-cursor + beep trick.
 
 Design notes:
   * The audio callback only ENQUEUES frames; a single consumer thread does all

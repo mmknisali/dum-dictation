@@ -6,6 +6,9 @@ __pycache__/
 # Local editor settings (machine-specific; may reference private extensions/paths)
 .vscode/
 
+# macOS
+.DS_Store
+
 # Generated locally by make-shortcut.ps1 (the Desktop icon image)
 dum.ico
 
@@ -30,5 +33,8 @@ results/
 .env
 *.env
 
-# Local-only Claude context (points to the private aios brain - must never go public)
-CLAUDE.local.md
+# Local-only notes / scratch context (never committed)
+*.local.md
+
+# Local demo-recording driver (never ship - would look like a faked demo)
+demo_local/
