@@ -108,9 +108,9 @@ class LinuxPlatform(Platform):
     def type_text(self, text):
         if not text:
             return
-        # Prefer ydotool on Wayland only when its daemon is actually responding;
-        # otherwise fall back to pynput typing so dictation still works.
-        if self._session == "wayland" and self._has_ydotool:
+        if self._session == "wayland":
+            # Wayland: ydotool (if its daemon is responsive) or pynput. xdotool is
+            # X11-only and a no-op on Wayland, so it is never used here.
             if self._ydotool_ok:
                 try:
                     r = subprocess.run(
@@ -123,7 +123,7 @@ class LinuxPlatform(Platform):
                     self._ydotool_ok = False
                 except Exception:
                     self._ydotool_ok = False
-            if not self._warned_ydotool:
+            if self._has_ydotool and not self._warned_ydotool:
                 self._warned_ydotool = True
                 print("[linux] ydotoold not responding - falling back to pynput typing. "
                       "Start it with: ydotoold &  (or enable the ydotoold service)",
@@ -133,9 +133,14 @@ class LinuxPlatform(Platform):
                 self._kb = Controller()
             self._kb.type(text)
             return
+        # X11 / unknown session: xdotool when present (fall back to pynput on
+        # failure), else pynput directly.
         if self._has_xdotool:
-            subprocess.run(["xdotool", "type", "--clearmodifiers", "--", text])
-            return
+            r = subprocess.run(
+                ["xdotool", "type", "--clearmodifiers", "--", text],
+                timeout=5.0, capture_output=True)
+            if r.returncode == 0:
+                return
         if self._kb is None:
             from pynput.keyboard import Controller
             self._kb = Controller()
@@ -158,7 +163,7 @@ class LinuxPlatform(Platform):
             subprocess.run(["xclip", "-selection", "clipboard"], input=text, text=True)
 
     def _send_paste(self):
-        if self._has_xdotool:
+        if self._session == "x11" and self._has_xdotool:
             subprocess.run(["xdotool", "key", "--clearmodifiers", "ctrl+v"])
             return
         from pynput.keyboard import Controller, Key
@@ -204,7 +209,8 @@ class LinuxPlatform(Platform):
             pass
 
     def frontmost_app(self):
-        if not self._has_xdotool:
+        # xdotool is X11-only; on Wayland it is a no-op, so don't even try it.
+        if self._session != "x11" or not self._has_xdotool:
             return None
         try:
             r = subprocess.run(
@@ -215,4 +221,4 @@ class LinuxPlatform(Platform):
             return None
 
     def supports_app_detection(self):
-        return self._has_xdotool
+        return self._session == "x11" and self._has_xdotool

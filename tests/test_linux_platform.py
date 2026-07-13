@@ -184,10 +184,23 @@ class TestTypeText(unittest.TestCase):
 
     def test_x11_uses_xdotool(self):
         p = _make_platform({"xdotool": "/usr/bin/xdotool"})
-        with mock.patch("platform_linux.subprocess.run") as run:
+        result = mock.MagicMock()
+        result.returncode = 0
+        with mock.patch("platform_linux.subprocess.run", return_value=result) as run:
             p.type_text("hello")
             run.assert_called_once_with(
-                ["xdotool", "type", "--clearmodifiers", "--", "hello"])
+                ["xdotool", "type", "--clearmodifiers", "--", "hello"],
+                timeout=5.0, capture_output=True)
+
+    def test_x11_xdotool_failure_falls_back_to_pynput(self):
+        p = _make_platform({"xdotool": "/usr/bin/xdotool"})
+        result = mock.MagicMock()
+        result.returncode = 1
+        with mock.patch("platform_linux.subprocess.run", return_value=result), \
+             self._fake_pynput():
+            p.type_text("hello")
+            self.assertTrue(p._kb is not None)
+            p._kb.type.assert_called_once_with("hello")
 
     def test_wayland_with_ydotoold_uses_ydotool(self):
         p = _make_platform({"ydotool": "/usr/bin/ydotool"},
@@ -240,6 +253,50 @@ class TestTypeText(unittest.TestCase):
             p.type_text("hi")
             self.assertTrue(p._kb is not None)
             p._kb.type.assert_called_once_with("hi")
+
+
+class TestSendPaste(unittest.TestCase):
+    """_send_paste routes Ctrl+V to xdotool on X11 and pynput on Wayland."""
+
+    def test_x11_uses_xdotool(self):
+        p = _make_platform({"xdotool": "/usr/bin/xdotool"}, session="x11")
+        with mock.patch("platform_linux.subprocess.run") as run:
+            p._send_paste()
+            run.assert_called_once_with(
+                ["xdotool", "key", "--clearmodifiers", "ctrl+v"])
+
+    def test_wayland_skips_xdotool(self):
+        # xdotool is installed (deps install it on all sessions) but on Wayland it
+        # must NOT be used - paste goes through pynput instead.
+        import types
+        fake = types.ModuleType("pynput")
+        fk = types.ModuleType("pynput.keyboard")
+        fk.Controller = lambda: mock.MagicMock()
+        fk.Key = mock.MagicMock()
+        fake.keyboard = fk
+        p = _make_platform({"xdotool": "/usr/bin/xdotool"},
+                           session="wayland", ydotoold_socket=True)
+        with mock.patch("platform_linux.subprocess.run") as run, \
+             mock.patch.dict(sys.modules, {"pynput": fake, "pynput.keyboard": fk}):
+            p._send_paste()
+            run.assert_not_called()
+
+
+class TestFrontmost(unittest.TestCase):
+    """frontmost_app / supports_app_detection are X11-only (xdotool is X11-only)."""
+
+    def test_wayland_returns_none(self):
+        p = _make_platform({"xdotool": "/usr/bin/xdotool"},
+                           session="wayland", ydotoold_socket=True)
+        self.assertIsNone(p.frontmost_app())
+        self.assertFalse(p.supports_app_detection())
+
+    def test_x11_uses_xdotool(self):
+        p = _make_platform({"xdotool": "/usr/bin/xdotool"}, session="x11")
+        with mock.patch("platform_linux.subprocess.run") as run:
+            run.return_value = mock.Mock(returncode=0, stdout="SomeApp\n")
+            self.assertEqual(p.frontmost_app(), "SomeApp")
+            self.assertTrue(p.supports_app_detection())
 
 
 class TestPaste(unittest.TestCase):
