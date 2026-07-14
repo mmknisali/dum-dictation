@@ -290,11 +290,11 @@ configure_ydotool() {
     info "would enable ydotool.service + drop in a socket chmod (Wayland typing)"
   else
     sudo systemctl enable ydotool.service 2>/dev/null || true
-    sudo mkdir -p /etc/systemd/system/ydotool.service.d
+    sudo mkdir -p /etc/systemd/system/ydotool.service.d || true
     printf '[Service]\nExecStartPost=/bin/sh -c "chmod 0666 %s 2>/dev/null || true"\n' \
       "/tmp/.ydotool_socket" \
-      | sudo tee /etc/systemd/system/ydotool.service.d/override.conf >/dev/null
-    sudo systemctl daemon-reload
+      | sudo tee /etc/systemd/system/ydotool.service.d/override.conf >/dev/null || true
+    sudo systemctl daemon-reload || true
     sudo systemctl restart ydotool.service 2>/dev/null || sudo systemctl start ydotool.service 2>/dev/null || true
     info "ydotoold enabled + socket opened for your user - Wayland typing will work (survives reboot)."
   fi

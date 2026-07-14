@@ -1243,7 +1243,16 @@ def run_double_tap_toggle(app, trigger_key="cmd_l", mode="toggle", block=True):
             log("[!] Falling back to pynput, but pynput can't see global keys under "
                 "Wayland - the double-tap hotkey will NOT fire. Fix the evdev issue "
                 "above (input group + log out/in) so the raw-input listener is used.")
-    from pynput import keyboard
+    # pynput's keyboard backend imports an X11 connection at import time; on a pure
+    # Wayland session with no XWayland that raises. Degrade to "no hotkey" instead of
+    # letting the exception propagate and take the whole daemon/tray down.
+    try:
+        from pynput import keyboard
+    except Exception as e:
+        log(f"[!] pynput keyboard listener unavailable ({e}) - the double-tap hotkey "
+            "is disabled. On Wayland, use the evdev listener (add yourself to the "
+            "'input' group and log out/in).")
+        return None
     _NAV = ("left", "right", "up", "down", "home", "end", "page_up", "page_down")
 
     def _pynput_token(key):
@@ -1305,7 +1314,8 @@ def run_tray(app, trigger_key="cmd_l", mode="toggle"):
 
     def _teardown():
         try:
-            listener.stop()
+            if listener is not None:
+                listener.stop()
         finally:
             app.stop()
             try:

@@ -53,6 +53,8 @@ echo "== unit: platform dispatch (mac/windows/fallback) =="
 $PY tests/test_platform_dispatch.py || fail=1
 echo "== unit: linux platform (x11/wayland backend) =="
 $PY tests/test_linux_platform.py || fail=1
+echo "== unit: evdev hotkey (device selection / feedback-loop filter) =="
+$PY tests/test_evdev_hotkey.py || fail=1
 echo "== unit: paste-atomic (clipboard save/restore) =="
 $PY tests/test_platform_paste.py || fail=1
 echo "== unit: lock-trim =="
